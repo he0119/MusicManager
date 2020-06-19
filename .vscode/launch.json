@@ -4,24 +4,19 @@
    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
    "version": "0.2.0",
    "configurations": [
+
         {
-            "name": ".NET Core Launch (console)",
+            "name": ".NET Core Launch",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/music-manager-csharp/bin/Debug/netcoreapp3.0/music-manager-csharp.dll",
+            "program": "${workspaceFolder}/src/bin/Debug/netcoreapp3.1/music-manager-csharp.exe",
             "args": [],
-            "cwd": "${workspaceFolder}/music-manager-csharp",
+            "cwd": "${workspaceFolder}/src",
             // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
             "console": "internalConsole",
             "stopAtEntry": false
         },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach",
-            "processId": "${command:pickProcess}"
-        }
     ]
 }
