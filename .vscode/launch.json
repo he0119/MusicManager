@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/music-manager-csharp/bin/Debug/netcoreapp3.1/music-manager-csharp.exe",
+            "program": "${workspaceFolder}/src/MusicManager/bin/Debug/netcoreapp3.1/MusicManager.exe",
             "args": [],
-            "cwd": "${workspaceFolder}/music-manager-csharp",
+            "cwd": "${workspaceFolder}/src/MusicManager",
             // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
             "console": "internalConsole",
             "stopAtEntry": false

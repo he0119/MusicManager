@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace music_manager_csharp
+namespace MusicManager
 {
     /// <summary>
     /// Interaction logic for App.xaml
