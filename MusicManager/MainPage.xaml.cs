@@ -1,4 +1,5 @@
-﻿using System;
+using MUXC = Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,5 +27,6 @@ namespace MusicManager
         {
             this.InitializeComponent();
         }
+
     }
 }
