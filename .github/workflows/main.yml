@@ -67,4 +67,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: MSIX Package
-        path: ${{ env.Project_Directory }}\${{ env.App_Packages_Directory }}
+        path: ${{ github.workspace }}\${{ env.Project_Directory }}\${{ env.App_Packages_Directory }}
