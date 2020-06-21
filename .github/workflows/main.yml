@@ -29,7 +29,6 @@ jobs:
         App_Packages_Directory: AppPackages
         Signing_Certificate: TemporaryKey.pfx
         Project_Directory: MusicManager
-        Project_Path: MusicManager\MusicManager.csproj
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -40,12 +39,6 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
 
-    # # Restore the application
-    # - name:  Restore the application to populate the obj folder with RuntimeIdentifiers
-    #   run: msbuild /t:Restore /p:Configuration=$env:Configuration
-    #   env:
-    #     Configuration: ${{ matrix.configuration }}
-
     # Decode the Base64 encoded Pfx
     - name: Decode the Pfx
       run: |
@@ -53,9 +46,15 @@ jobs:
         $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath $env:Signing_Certificate
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
 
+    # Restore the application
+    - name:  Restore the application to populate the obj folder with RuntimeIdentifiers
+      run: msbuild /t:Restore
+      env:
+        Configuration: ${{ matrix.configuration }}
+
     # Build
     - name: Build App
-      run: msbuild $env:Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:AppxBundlePlatforms=$env:Appx_Bundle_Platforms /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile=$env:Signing_Certificate /p:AppxPackageDir=$env:App_Packages_Directory
+      run: msbuild /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:AppxBundlePlatforms=$env:Appx_Bundle_Platforms /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile=$env:Signing_Certificate /p:AppxPackageDir=$env:App_Packages_Directory
       env:
         Configuration: ${{ matrix.configuration }}
 
@@ -63,9 +62,9 @@ jobs:
     - name: Remove the .pfx
       run: Remove-Item -path $env:Project_Directory\$env:Signing_Certificate
 
-    # Upload the MSIX package: https://github.com/marketplace/actions/upload-artifact
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v1
+    # Upload the MSIX package: https://github.com/actions/upload-artifact
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2
       with:
         name: MSIX Package
         path: ${{ env.Project_Directory }}\${{ env.App_Packages_Directory }}
