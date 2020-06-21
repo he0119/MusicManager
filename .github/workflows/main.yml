@@ -67,5 +67,7 @@ jobs:
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: MSIX Package
+        name: MSIX Package ${{ env:Configuration }}
         path: ${{ github.workspace }}\${{ env.Project_Directory }}\${{ env.App_Packages_Directory }}
+      env:
+        Configuration: ${{ matrix.configuration }}
