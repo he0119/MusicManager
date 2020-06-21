@@ -29,6 +29,7 @@ jobs:
         App_Packages_Directory: AppPackages
         Signing_Certificate: TemporaryKey.pfx
         Project_Directory: MusicManager
+        Project_File: MusicManager\MusicManager.csproj
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -54,7 +55,7 @@ jobs:
 
     # Build
     - name: Build App
-      run: msbuild /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:AppxBundlePlatforms="${{ env.Appx_Bundle_Platforms }}" /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile=$env:Signing_Certificate /p:AppxPackageDir=$env:App_Packages_Directory
+      run: msbuild $env:Project_File /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:AppxBundlePlatforms="${{ env.Appx_Bundle_Platforms }}" /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile=$env:Signing_Certificate /p:AppxPackageDir=$env:App_Packages_Directory
       env:
         Configuration: ${{ matrix.configuration }}
 
