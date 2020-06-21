@@ -24,9 +24,9 @@ jobs:
 
     env:
         Appx_Bundle: Always
-        App_Packages_Directory: AppPackages
-        Appx_Bundle_Platforms: x86|x64
+        Appx_Bundle_Platforms: x86|x64|ARM
         Appx_Package_Build_Mode: SideloadOnly
+        App_Packages_Directory: AppPackages
         Signing_Certificate: TemporaryKey.pfx
         Project_Directory: MusicManager
         Project_Path: MusicManager\MusicManager.csproj
@@ -40,11 +40,11 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
 
-    # Restore the application
-    - name:  Restore the application to populate the obj folder with RuntimeIdentifiers
-      run: msbuild /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+    # # Restore the application
+    # - name:  Restore the application to populate the obj folder with RuntimeIdentifiers
+    #   run: msbuild /t:Restore /p:Configuration=$env:Configuration
+    #   env:
+    #     Configuration: ${{ matrix.configuration }}
 
     # Decode the Base64 encoded Pfx
     - name: Decode the Pfx
