@@ -14,13 +14,21 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    
+
     strategy:
       matrix:
         configuration: [Debug, Release]
-    
+
     # The type of runner that the job will run on
     runs-on: windows-latest
+
+    env:
+        Appx_Bundle: Always
+        App_Packages_Directory: AppPackages
+        Appx_Bundle_Platforms: x86|x64
+        Appx_Package_Build_Mode: SideloadOnly
+        Signing_Certificate: TemporaryKey.pfx
+        Project_Directory: MusicManager
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -30,16 +38,33 @@ jobs:
     # Setup msbuild
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
-    
+
     # Restore the application
     - name:  Restore the application to populate the obj folder with RuntimeIdentifiers
       run: msbuild /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
-    
+
+    # Decode the Base64 encoded Pfx
+    - name: Decode the Pfx
+      run: |
+        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.BASE64_ENCODED_PFX }}")
+        $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath $env:Signing_Certificate
+        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
+
     # Build
-    - name: Build app
-      run: msbuild /p:Configuration=$env:Configuration
+    - name: Build App
+      run: msbuild $env:Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile=$env:Signing_Certificate
       env:
         Configuration: ${{ matrix.configuration }}
 
+    # Remove the .pfx
+    - name: Remove the .pfx
+      run: Remove-Item -path $env:Project_Directory\$env:Signing_Certificate
+
+    # Upload the MSIX package: https://github.com/marketplace/actions/upload-artifact
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: MSIX Package
+        path: ${{ env.Project_Directory }}\${{ env.App_Packages_Directory }}
