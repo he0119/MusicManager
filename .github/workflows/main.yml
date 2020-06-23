@@ -1,0 +1,73 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    env:
+        Appx_Bundle: Always
+        Appx_Bundle_Platforms: x86|x64|ARM
+        Appx_Package_Build_Mode: SideloadOnly
+        App_Packages_Directory: AppPackages
+        Signing_Certificate: TemporaryKey.pfx
+        Project_Directory: MusicManager
+        Project_File: MusicManager\MusicManager.csproj
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Setup msbuild
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.0
+
+    # Decode the Base64 encoded Pfx
+    - name: Decode the Pfx
+      run: |
+        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.BASE64_ENCODED_PFX }}")
+        $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath $env:Signing_Certificate
+        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
+
+    # Restore the application
+    - name:  Restore the application to populate the obj folder with RuntimeIdentifiers
+      run: msbuild $env:Project_File /t:Restore
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+    # Build
+    - name: Build App
+      run: msbuild $env:Project_File /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:AppxBundlePlatforms="${{ env.Appx_Bundle_Platforms }}" /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile=$env:Signing_Certificate /p:AppxPackageDir=$env:App_Packages_Directory
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+    # Remove the .pfx
+    - name: Remove the .pfx
+      run: Remove-Item -path $env:Project_Directory\$env:Signing_Certificate
+
+    # Upload the MSIX package: https://github.com/actions/upload-artifact
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: MSIX Package ${{ env.Configuration }}
+        path: ${{ github.workspace }}\${{ env.Project_Directory }}\${{ env.App_Packages_Directory }}
+      env:
+        Configuration: ${{ matrix.configuration }}
