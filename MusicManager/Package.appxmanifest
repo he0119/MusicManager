@@ -9,7 +9,7 @@
   <Identity
     Name="3881e5c6-225d-4808-bc19-a64fc80923d2"
     Publisher="CN=hmy01"
-    Version="1.0.0.0" />
+    Version="0.1.0.0" />
 
   <Properties>
     <DisplayName>MusicManager</DisplayName>
